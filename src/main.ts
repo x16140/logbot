@@ -1,27 +1,17 @@
-import 'reflect-metadata'
+import 'reflect-metadata';
 
-import { MainModule } from '@cmdify/core'
-import { Init } from '@cmdify/common'
+import { importx } from '@discordx/importer';
 
-import * as commands from './commands'
-import * as listeners from './listeners'
+import { client } from './client';
 
-import { Bot } from './bot'
+async function bootstrap() {
+  await importx(__dirname + '/{events,commands}/**/*.{ts,js}');
 
-@MainModule({
-  name: 'module:main',
-  token: process.env.TOKEN,
-
-  prefix: '.',
-
-  client: Bot,
-
-  commands: Object.values(commands),
-  listeners: Object.values(listeners)
-})
-class Main {
-  @Init()
-  public async init() {
-    console.log('Initialized!')
+  if (!process.env.BOT_TOKEN) {
+    throw Error('Could not find BOT_TOKEN in your environment');
   }
+
+  await client.login(process.env.BOT_TOKEN);
 }
+
+bootstrap();
